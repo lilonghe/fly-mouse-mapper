@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>空中飞鼠 · 按键映射</title>
+<link rel="icon" href="data:,">
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff; --line:#e3e7ec; --text:#1f2328; --muted:#667085;
+    --blue:#2f81f7; --blue-soft:#eaf2ff; --green:#12a06a; --red:#d92d20;
+    --key:#1c1e22; --key-edge:#3a3f46; --key-text:#e9edf2; --fn:#57b0ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+       font:14px/1.6 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+  button{font-family:inherit;cursor:pointer}
+  .wrap{max-width:1220px;margin:0 auto;padding:22px 20px 60px}
+  header{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+  h1{font-size:19px;font-weight:600;margin:0}
+  .sub{color:var(--muted);font-size:12px;margin-top:2px}
+  .grow{flex:1}
+  .pill{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:20px;
+        background:#eef1f4;font-size:12px;color:var(--muted);white-space:nowrap}
+  .pill .dot{width:8px;height:8px;border-radius:50%;background:#98a2b3}
+  .pill.on{background:#e6f6ee;color:#0b7a4f}
+  .pill.on .dot{background:var(--green)}
+  .pill.bad{background:#fdecea;color:#b42318}
+  .pill.bad .dot{background:var(--red)}
+  .btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:8px;
+       padding:8px 13px;font-size:13px;transition:.15s}
+  .btn:hover{border-color:#b6c0cc;background:#fafbfc}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+  .btn.primary:hover{background:#1f6fdd}
+  .btn.danger{color:var(--red)}
+  .btn.ghost{background:transparent}
+  .btn.sm{padding:5px 10px;font-size:12px}
+  .btn.master{font-size:14px;padding:10px 22px;font-weight:600}
+  .btn.master.off{background:#fff;color:var(--muted);border-color:var(--line)}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start}
+  @media(max-width:1080px){.layout{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+  .card h2{font-size:14px;font-weight:600;margin:0 0 4px}
+  .card .hint{font-size:12px;color:var(--muted);margin:0 0 12px}
+  /* 右下角：当前一起按住的键（实时组合） */
+  .chord-float{position:fixed;right:18px;bottom:18px;z-index:40;min-width:212px;max-width:340px;
+    background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 13px;
+    box-shadow:0 8px 26px rgba(15,23,42,.16);pointer-events:none}
+  .chord-float.idle{opacity:.72}
+  .chord-float .cf-title{font-size:11px;color:var(--muted);margin-bottom:7px;
+    display:flex;justify-content:space-between;gap:12px}
+  .cf-keys,.chord-detail{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+  /* 键位标签（含占位）统一字号 / 行高 / 高度。
+     占位类名不能叫 empty —— 会撞上通用 .empty{font-size:13px;padding:14px 0} 被撑高。 */
+  .kc{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;
+    height:26px;min-height:26px;padding:0 9px;
+    border:1px solid var(--line);border-radius:6px;
+    font-family:ui-monospace,Consolas,"Microsoft YaHei",monospace;
+    font-size:12px;line-height:1;font-weight:500;white-space:nowrap;
+    background:#f8fafc;color:var(--text)}
+  .kc.mod{background:#eaf2ff;border-color:#a9c9ff;color:#1754b5;font-weight:600}
+  .kc.inj{background:#f4ecff;border-color:#d7bbff;color:#7b35c9;font-weight:600}
+  .kc.placeholder{border-style:dashed;color:var(--muted);background:transparent}
+  .kc.replaced{opacity:.6;text-decoration:line-through;border-style:dashed}
+  .plus{display:inline-flex;align-items:center;height:26px;
+        color:var(--muted);font-size:12px;line-height:1}
+  .chord-detail{margin:8px 0 6px}
+  .chord-detail .lbl{font-size:11px;color:var(--muted);width:100%}
+  .diag-peak{display:flex;align-items:baseline;gap:8px;font-size:12px;color:var(--muted);margin:4px 0 10px}
+  .diag-peak b{font-size:22px;color:var(--blue)}
+  .diag-list{font:11px/1.7 ui-monospace,Consolas,monospace;color:var(--text);background:#f8fafc;
+    border:1px solid var(--line);border-radius:8px;padding:7px 10px;max-height:118px;overflow:auto}
+  .diag-list div{border-bottom:1px dashed var(--line);padding:2px 0}
+  .diag-list div:last-child{border-bottom:0}
+  .diag-warn{font-size:12px;line-height:1.7;background:#fff7ed;border:1px solid #fed7aa;
+    color:#9a3412;border-radius:8px;padding:9px 11px;margin:10px 0 0}
+  .diag-warn code{background:#ffedd5;padding:0 3px;border-radius:3px}
+  .kbd-panel{background:linear-gradient(155deg,#eef0f2 0%,#d5d9de 45%,#c9ced5 100%);
+             border:1px solid #bcc2ca;border-radius:22px;padding:18px;box-shadow:0 1px 2px #0000000a}
+  .kbd-inner{border-radius:14px;padding:4px 0}
+  .krow{display:flex;gap:6px;margin:6px 0}
+  .key{position:relative;min-width:0;height:64px;background:var(--key);
+       border:1px solid var(--key-edge);border-radius:10px;
+       box-shadow:inset 0 1px 0 #ffffff14,0 1px 2px #00000030;transition:.12s}
+  .key:hover{border-color:#6b7684}
+  .key.sel{outline:2px solid var(--blue);outline-offset:2px}
+  .key.mapped{box-shadow:inset 0 1px 0 #ffffff14,0 0 0 1px #12a06a55}
+  .key-body{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:0;
+            color:var(--key-text);display:flex;align-items:center;justify-content:center;
+            border-radius:10px;padding:0 4px}
+  .main-label{font-size:16px;font-weight:500;letter-spacing:.3px;text-align:center;
+              max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .main-label.small{font-size:12px}
+  .main-label.tiny{font-size:10px;white-space:normal;line-height:1.15}
+  .main-label.blue{color:var(--fn);font-size:13px}
+  .fn-chip{position:absolute;top:4px;right:5px;width:24px;height:19px;padding:0;
+           background:transparent;border:1px solid transparent;border-radius:5px;
+           color:var(--fn);font-size:12px;line-height:17px;text-align:center;font-weight:600}
+  .fn-chip:hover{background:#2b6fb32b;border-color:#57b0ff66}
+  .fn-below{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);
+            background:transparent;border:1px solid transparent;border-radius:4px;
+            color:var(--fn);font-size:10px;padding:0 5px;white-space:nowrap;line-height:15px}
+  .fn-below:hover{background:#2b6fb32b;border-color:#57b0ff66}
+  .out-label{position:absolute;top:5px;left:8px;right:30px;text-align:left;
+             color:#6ee7b7;font-size:9px;line-height:1.25;white-space:nowrap;
+             overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+  .dot-mapped{position:absolute;top:6px;left:3px;width:5px;height:5px;border-radius:50%;
+              background:#3ddc97;pointer-events:none}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:12px}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .sel-title{font-size:15px;font-weight:600;margin:0 0 2px}
+  .empty{color:var(--muted);font-size:13px;padding:14px 0}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+  .val{border:1px dashed var(--line);background:#f8fafc;border-radius:8px;padding:9px 11px;
+       font-size:13px;min-height:38px;word-break:break-all}
+  .val.set{border-style:solid;border-color:#b9dcff;background:var(--blue-soft);color:#0b4fa2;font-weight:500}
+  input[type=text]{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;
+                   font-size:13px;font-family:inherit;color:var(--text);background:#fff}
+  input[type=text]:focus{outline:2px solid #2f81f733;border-color:var(--blue)}
+  select{border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12px;
+         font-family:inherit;color:var(--text);background:#fff}
+  .trig-status{font-size:11px;line-height:1.6;margin:6px 0 0;
+               word-break:normal;overflow-wrap:anywhere}
+  .trig-status.ok{color:#0b7a4f}
+  .trig-status.err{color:var(--red)}
+  .trig-status.idle{color:var(--muted)}
+  .trig-help{font-size:11px;color:var(--muted);margin:7px 0 0;line-height:1.7}
+  .trig-help code{background:#eef1f4;padding:1px 4px;border-radius:3px;font-size:11px}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;max-height:132px;overflow:auto;padding:2px}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 9px;font-size:12px}
+  .chip:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-soft)}
+  .chip.active{background:var(--blue);border-color:var(--blue);color:#fff}
+  .group{margin-top:10px}
+  .group>span{font-size:11px;color:var(--muted)}
+  .tabs{display:flex;gap:4px;margin-bottom:9px}
+  .tab{flex:1;border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px;font-size:12px}
+  .tab.active{background:#eef4ff;border-color:#b9d3ff;color:#0b4fa2;font-weight:600}
+  .rule{border:1px solid var(--line);border-radius:8px;padding:9px 10px;margin-bottom:7px;font-size:12px}
+  .rule .top{display:flex;align-items:center;gap:6px}
+  .rule .name{font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rule .map{color:var(--muted);margin-top:3px;word-break:break-all}
+  .rule .map b{color:var(--green);font-weight:600}
+  .ev{font:11px/1.5 ui-monospace,Consolas,monospace;padding:4px 0;border-bottom:1px solid #f0f2f5}
+  .ev-head{display:flex;gap:8px;align-items:baseline}
+  .ev .time{color:#98a2b3;flex:none}
+  .ev .kind{flex:none;width:52px;color:#667085}
+  .ev.hit .kind{color:var(--green);font-weight:600}
+  .ev.capture .kind{color:var(--blue)}
+  .ev.inject .kind{color:#a855f7}
+  .ev.altgr .kind{color:#d97706}
+  .ev .detail{color:var(--text);word-break:break-all}
+  .ev-raw,.ev-hid{margin:2px 0 0 68px;font-size:10px;line-height:1.5;
+                  white-space:pre-wrap;word-break:break-all}
+  .ev-raw{color:#7a8699}
+  .ev-raw.dim,.ev-hid.dim{color:#b0b8c4}
+  .ev-hid{color:#0b6bcb;cursor:copy}
+  .ev-hid:hover{text-decoration:underline}
+  #events{max-height:300px;overflow:auto}
+  .rawtoggle{float:right;font-size:12px;font-weight:400;color:var(--muted);
+             display:inline-flex;align-items:center;gap:5px;cursor:pointer}
+  .rawtoggle input{cursor:pointer}
+  .banner{display:none;align-items:center;gap:10px;background:#fff7e6;border:1px solid #fedf89;
+          color:#93370d;border-radius:8px;padding:9px 11px;font-size:12px;margin-bottom:10px}
+  .banner.show{display:flex}
+  .spinner{width:12px;height:12px;border:2px solid #f0b35c;border-top-color:transparent;
+           border-radius:50%;animation:spin .8s linear infinite;flex:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  details summary{cursor:pointer;font-size:13px;font-weight:600;padding:4px 0}
+  .help p{font-size:12px;color:var(--muted);margin:8px 0}
+  .help b{color:var(--text)}
+  .conn-banner{display:none;align-items:center;gap:12px;background:#fff4e5;border:1px solid #f4c47a;
+               color:#8a4b08;border-radius:10px;padding:11px 14px;margin-bottom:16px;font-size:13px;line-height:1.65}
+  .conn-banner.show{display:flex}
+  .conn-banner .grow{flex:1}
+  .conn-banner a{color:#0b4fa2;font-weight:600;text-decoration:none;border-bottom:1px solid #9cc4ff}
+  .conn-banner code{background:#00000010;padding:1px 5px;border-radius:4px;font-size:12px}
+  .btn.capture{font-weight:600;padding:9px 14px;white-space:nowrap}
+  .btn.capture.on{background:#e6f6ee;color:#0b7a4f;border-color:#9dddc0}
+  .btn.capture.on:hover{background:#d6f0e3}
+  .btn.capture.off{background:#fdecea;color:#b42318;border-color:#f1b4ad}
+  .btn.capture.off:hover{background:#fbdcd8}
+  .cap-notice{display:none;align-items:flex-start;gap:10px;background:#eef2ff;border:1px solid #c7d5ff;
+              color:#25356b;border-radius:10px;padding:11px 14px;margin-bottom:16px;font-size:13px;line-height:1.65}
+  .cap-notice.show{display:flex}
+  .cap-notice b{color:#1b3a8f}
+  .stuck{display:none;margin:0 0 10px;padding:7px 10px;border-radius:8px;background:#fff4e5;
+         border:1px solid #f4c47a;color:#8a4b08;font-size:12px}
+  .stuck.show{display:block}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);
+         background:#1f2328;color:#fff;padding:10px 18px;border-radius:9px;font-size:13px;
+         opacity:0;pointer-events:none;transition:.2s;z-index:99}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .foot{font-size:11px;color:#98a2b3;text-align:center;margin-top:22px;padding-bottom:96px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>空中飞鼠 · 背面键盘映射</h1>
+      <div class="sub">点击键帽选位 → 手写或录制实际按法 → 设置替换成什么 → 打开总开关</div>
+    </div>
+    <div class="grow"></div>
+    <span class="pill" id="hookPill"><span class="dot"></span>引擎连接中</span>
+    <button class="btn capture on" id="captureBtn" title="关闭后卸载低级键盘钩子，所有按键原样放行">键盘捕获：开启</button>
+    <button class="btn sm" id="releaseBtn" title="补发抬起，解除卡在按下状态的 Ctrl / Alt / Win / AltGr">释放卡住的键</button>
+    <button class="btn master off" id="masterBtn">总开关：关闭</button>
+    <button class="btn sm" id="exportBtn">导出</button>
+    <button class="btn sm" id="importBtn">导入</button>
+    <input type="file" id="fileInput" accept="application/json,.json" hidden>
+  </header>
+
+  <div class="banner" id="recBanner"><span class="spinner"></span><span id="recText">正在录制…</span>
+    <div class="grow"></div><button class="btn sm" id="recCancel">取消</button></div>
+
+  <div class="cap-notice" id="capNotice">
+    <div class="grow"><b>键盘捕获已关闭</b>：低级键盘钩子已卸载，所有按键原样放行，程序不再记录、拦截或注入任何按键，映射也不生效。
+      需要重新映射时，点右上角「键盘捕获：关闭」按钮即可开启；这个选择会保存，重启程序后仍然保持。</div>
+  </div>
+
+  <div class="conn-banner" id="connBanner">
+    <div class="grow" id="connText"></div>
+    <button class="btn sm" id="retryBtn">重试连接</button>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div class="card">
+        <h2>键位布局</h2>
+        <p class="hint">白色大字＝主键位，右上角蓝色小字＝Fn + 该键的蓝色副键位。两处都可以单独点击配置。</p>
+        <div class="kbd-panel"><div class="kbd-inner" id="keyboard"></div></div>
+        <div class="legend">
+          <span><i style="background:#3ddc97"></i>已配置映射</span>
+          <span><i style="background:#2f81f7"></i>当前选中</span>
+          <span style="color:#2f81f7">■ 蓝色字符 = Fn 层</span>
+          <span>键帽文字可在右侧面板里改</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>实时按键监视
+          <label class="rawtoggle"><input type="checkbox" id="showRaw" checked>显示原始 HID 字段</label>
+          <label class="rawtoggle"><input type="checkbox" id="showUp">显示抬起事件</label>
+        </h2>
+        <p class="hint">按空中飞鼠上的键时这里显示系统实际收到的键，以及低级键盘钩子拿到的原始字段：VK、扫描码、Flags 位、窗口消息、时间戳、Extra，
+          并按 HID 1.12 规范推断 Usage 与等效 8 字节报告。命中映射标绿色；紫色是程序注入的输出键。<br>
+          <b>注意</b>：Windows 低级钩子只能拿到转换后的 vkCode + scanCode，拿不到 USB HID 原始报文；带 ※ 的是推断 / 重建值，
+          真实报文需要过滤驱动或硬件抓包。点蓝色 HID 行可复制。</p>
+        <div class="stuck" id="stuckInfo"></div>
+        <details open><summary>展开 / 收起事件流</summary><div id="events"></div></details>
+      </div>
+    </div>
+
+    <div>
+      <div class="card" id="editorCard">
+        <h2>按键配置</h2>
+        <p class="hint" id="editorHint">先在左边点一个键位。</p>
+        <div id="editor"></div>
+      </div>
+
+      <div class="card">
+        <h2>已保存的规则 <span id="ruleCount" style="color:var(--muted);font-weight:400"></span></h2>
+        <div id="rules"></div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn sm danger" id="clearBtn">清空全部</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>当前一起按住的键</h2>
+        <p class="hint">按住空中飞鼠上的键时实时显示系统里等效的组合。蓝色＝真实按下的修饰键，紫色＝映射规则注入并保持的替换键；右下角浮条同屏显示。</p>
+        <div id="chordDetail"></div>
+      </div>
+
+      <div class="card">
+        <h2>组合键诊断 <button class="btn sm" id="diagReset" style="float:right">重置</button></h2>
+        <p class="hint">按住三个键做一次测试，这里记录引擎实际「看到」的最大同时键数与最近几次组合，用来区分硬件限制和软件问题。</p>
+        <div class="diag-peak">本次峰值同时按住：<b id="diagPeak">0</b> 键</div>
+        <div class="diag-list" id="diagHistory"><div>还没有记录。</div></div>
+        <div class="diag-warn" id="diagHint"></div>
+      </div>
+
+      <div class="card help">
+        <details><summary>使用说明与已知限制</summary>
+          <p><b>流程：</b>点左侧键帽（白色主键或蓝色 Fn 副键）→ 在「① 实际按法」里<b>手写</b>按键组合，或点「录制实际按法」在<b>空中飞鼠</b>上按一次 → 选「替换为」的输出 → 保存 → 打开右上角总开关。</p>
+          <p><b>① 实际按法可以手写：</b>直接输入 <code>Ctrl+Win+Left</code>、<code>Alt+Tab</code>、<code>AltGr</code>、<code>Q</code>；也支持原始键码 <code>0x51</code>、<code>VK 229</code>，以及照着事件流写 <code>usage 0x0014</code>（HID Usage）。修饰键写前面、最后一个是主键，例如 <code>Ctrl+Alt+Q</code>；别名 <code>Command / Super / Meta / Windows</code> 都当作 Win，<code>RightAlt / RAlt</code> 当作 AltGr。<b>Fn 是空中飞鼠内部层键</b>，Windows 收不到，所以 <code>Fn+Q</code> 不能手写 —— 先录制一次 Fn+Q，看事件流里实际发出的组合，再照着写。手写不依赖键盘捕获，捕获关着也能编辑规则；下面会显示解析出的 VK / Scan / HID 字段，确认无误再保存。「匹配方式」选「忽略额外修饰键」时，同时多按了别的修饰键也照样触发。</p>
+          <p><b>键盘捕获开关（右上角）：</b>这是独立于「映射总开关」的总闸。<b>开启</b>＝安装低级键盘钩子，程序才能看到、拦截、替换按键；<b>关闭</b>＝<b>卸载钩子</b>，所有按键原样放行，程序不再记录 / 拦截 / 注入任何按键，映射自然也不生效。选择会写进 mappings.json，重启后保持。若遇到「按任何键都没反应」，先<b>关闭捕获</b>再点「释放卡住的键」：通常是某个修饰键（AltGr / Win 等）残留在按下状态，把所有输入都变成了组合键；程序现在也会自动检测并解除这类卡键。快捷键 <code>Ctrl+Alt+Shift+F11</code> 可一键关闭捕获（关闭后钩子已卸载，需用界面按钮重新开启），<code>Ctrl+Alt+Shift+F12</code> 只切换映射总开关。也可直接访问 <code>/api/capture?on=0</code> 或 <code>?on=1</code> 开关。</p>
+          <p><b>录制期间</b>所有按键都会被程序吞掉，不会输入到别的窗口，8 秒无操作自动结束。想换成另一个键，可用「录一个目标键」。</p>
+          <p><b>单独按修饰键</b>（AltGr / Alt / Ctrl / Shift / Win）：按下时事件流会显示「单独按下，松开即录到该键」，<b>松开该键</b>才完成录制；事件流里写「无修饰键」只是说没有别的修饰键同时按住，不是报错也不是没录到。若同时按住 Ctrl 等，录制结果会带 Ctrl。</p>
+          <p><b>AltGr → Win：</b>点第四行 <code>AltGr</code> 键帽 → 录制实际按法并在空中飞鼠上按一下 AltGr（会录成 <code>AltGr</code>，不是 <code>Alt</code> 或 <code>Ctrl+Alt</code>）→ 在「替换为」的<b>修饰键 / Win</b> 分组点「Win 键（按住生效）」→ 保存。这样按住 AltGr 时 Win 保持按下，可以配 R / E / D 使用；直接输入 <code>Win</code> 只会点按一下。Windows 为 AltGr 附带的假 Ctrl 会被自动抵消。</p>
+          <p><b>AltGr 的识别依据</b>是「右 Alt」（VK_RMENU，或带 EXT 标志的 Alt），所以物理键盘的<b>右 Alt 也会一起被映射</b>，左 Alt 不受影响。总开关关闭时程序不会改动任何按键行为。按一下 AltGr，可在事件流里看到 <code>AltGr</code> 与原始 <code>VK 0xA5 / Usage 0x00E6</code>；若显示的是别的值，说明空中飞鼠发的键码不同，需要改识别条件。</p>
+          <p><b>组合键（Ctrl + Win 等）：</b>把某键换成 Win / Ctrl 这类修饰键的规则会<b>透传</b>同时按住的其它修饰键：先按住 Ctrl 再按 AltGr，系统里就是 <code>Ctrl + Win</code>，还能继续接方向键。程序不再为了「避免污染输出」提前松开 Ctrl；只有普通替换（如换成 Esc）才会先松开触发组合里的修饰键。同一键若另有精确组合规则（如 <code>Ctrl+Q → Esc</code>），精确规则优先。</p>
+          <p><b>三键同按失效怎么判断：</b>先按住三个键，看右侧「组合键诊断」的<b>峰值键数</b>。达到 3 说明键都到了引擎，那问题在 Windows 侧 —— 不少 Win 组合是系统保留快捷键（<code>Ctrl+Win+←/→</code> 切换虚拟桌面、<code>Win+L</code> 锁屏、<code>Ctrl+Alt+Del</code> 安全序列），任何应用层注入都无效。若峰值只有 2，说明是空中飞鼠 / 键盘硬件的多键回滚（2KRO）：同时按三个键时第三个根本没发出来，软件层无法补救；<b>解决办法是把整个组合绑到一个键上</b>（自定义组合键里写 <code>Ctrl+Win+Left</code>），用一次单键发出完整组合。另外「假 Ctrl」抵消逻辑已收紧：只要同时按着 Shift 等其它键，就不会误把你真正按住的 Ctrl 松开。</p>
+          <p><b>右下角浮条</b>实时显示当前一起按住的键与系统等效组合：蓝色是真实按下的修饰键，紫色是映射规则注入并保持的替换键；右侧「当前一起按住的键」卡片还有来源拆解。排查组合键时先按住键看这里。</p>
+          <p><b>Fn 层：</b>空中飞鼠上的 Fn + 白键在 Windows 里通常表现为 Alt/Ctrl + 字母之类的组合键，录制结果会如实显示，不用自己猜。</p>
+          <p><b>作用范围：</b>低级键盘钩子无法区分按键来自哪个设备，所以映射是<b>全局</b>的，物理键盘上同名按键同样会被替换。关掉总开关、按 Ctrl+Alt+Shift+F12，或直接退出程序即可立刻恢复，不写注册表。</p>
+          <p><b>捕获不到的键：</b>空中飞鼠部分非标准键（返回键 / 独立音量键）会被 Windows 蓝牙键盘驱动在内核层丢弃，任何应用层工具（含本工具、AutoHotkey）都收不到；要做到设备级隔离或捕获这些键需要签名过滤驱动，本工具刻意不引入。</p>
+          <p><b>配置</b>保存在程序目录的 mappings.json，可导出备份；程序不常驻时映射不生效。</p>
+        </details>
+      </div>
+    </div>
+  </div>
+  <div class="foot">空中飞鼠 · 按键映射 · 本机运行 · 不联网 · Python 标准库实现</div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="chord-float idle" id="chordFloat">
+  <div class="cf-title"><span>当前一起按住的键</span><span>实时</span></div>
+  <div class="cf-keys" id="chordKeys"><span class="kc placeholder">（没有按住的键）</span></div>
+</div>
+
+<script>
+const LAYOUT = [
+  [
+    {id:'r1c1', main:'Esc',  fn:'↩',  small:true},
+    {id:'r1c2', main:'Q',    fn:'`'},
+    {id:'r1c3', main:'W',    fn:'1'},
+    {id:'r1c4', main:'E',    fn:'2'},
+    {id:'r1c5', main:'R',    fn:'3'},
+    {id:'r1c6', main:'T',    fn:'4'},
+    {id:'r1c7', main:'Y',    fn:'5'},
+    {id:'r1c8', main:'U',    fn:'6'},
+    {id:'r1c9', main:'I',    fn:'7'},
+    {id:'r1c10',main:'O',    fn:'8'},
+    {id:'r1c11',main:'P',    fn:'9'},
+    {id:'r1c12',main:'Del',  fn:'0',  small:true}
+  ],
+  [
+    {id:'r2c1', main:'Caps',  fn:'~', w:1.8, small:true},
+    {id:'r2c2', main:'A',     fn:'!'},
+    {id:'r2c3', main:'S',     fn:'@'},
+    {id:'r2c4', main:'D',     fn:'#'},
+    {id:'r2c5', main:'F',     fn:'$'},
+    {id:'r2c6', main:'G',     fn:'%'},
+    {id:'r2c7', main:'H',     fn:'^'},
+    {id:'r2c8', main:'J',     fn:'&'},
+    {id:'r2c9', main:'K',     fn:'*'},
+    {id:'r2c10',main:'L',     fn:'('},
+    {id:'r2c11',main:'◄ BACK',fn:')', w:1.8, small:true}
+  ],
+  [
+    {id:'r3c1', main:'Shift', fn:'\\', w:1.7, small:true},
+    {id:'r3c2', main:'Z',     fn:'<'},
+    {id:'r3c3', main:'X',     fn:'>'},
+    {id:'r3c4', main:'C',     fn:"'"},
+    {id:'r3c5', main:'V',     fn:'"'},
+    {id:'r3c6', main:'B',     fn:';'},
+    {id:'r3c7', main:'N',     fn:':'},
+    {id:'r3c8', main:'M',     fn:"'"},
+    {id:'r3c9', main:'?',     fn:'/'},
+    {id:'r3c10',main:'▲',     fn:'PgUp', below:true},
+    {id:'r3c11',main:'↵ Enter',fn:'Ctrl+Alt+Del', w:1.8, below:true, small:true}
+  ],
+  [
+    {id:'r4c1', main:'Ctrl',  fn:'|', small:true},
+    {id:'r4c2', main:'Fn',    fn:null, blue:true},
+    {id:'r4c3', main:'− _',   fn:'[', small:true},
+    {id:'r4c4', main:'+ =',   fn:']', small:true},
+    {id:'r4c5', main:'Alt',   fn:'{', small:true},
+    {id:'r4c6', main:'',      fn:null, w:3.4, space:true},
+    {id:'r4c7', main:'AltGr', fn:'}', small:true},
+    {id:'r4c8', main:'◀',     fn:'Home', below:true},
+    {id:'r4c9', main:'▼',     fn:'PgDn', below:true},
+    {id:'r4c10',main:'▶',     fn:'End',  below:true},
+    {id:'r4c11',main:'www.',  fn:'.com', w:1.35, below:true}
+  ]
+];
+const MODVK = {ctrl:162, shift:160, alt:164, win:91};
+const MODCN = {ctrl:'Ctrl', shift:'Shift', alt:'Alt', win:'Win'};
+
+let config = {version:1, enabled:false, rules:[], labels:{}};
+let catalog = [], vkNames = {};
+let selected = null;
+let draft = {trigger:null, triggerInput:'', action:null, type:'keys'};
+let lastSeq = 0, lastRuleSig = '', toastTimer = null;
+let activeGroup = 0, catalogReady = false, initialSyncDone = false;
+let captureOn = true;            // 实际钩子状态（由 /api/state 的 capture_on 刷新）
+let trigTimer = null, trigSeq = 0, trigDirty = false;   // 手写触发条件的防抖 / 过期响应保护
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const SAME_ORIGIN = location.hostname === '127.0.0.1' && location.port === '8765';
+const API_BASE = SAME_ORIGIN ? '' : 'http://127.0.0.1:8765';
+const LIVE_URL = 'http://127.0.0.1:8765/';
+// file:// 等本地静态预览的 Origin 是 null，浏览器会禁止它 fetch 本机接口，
+// 这种情况不该显示「引擎没启动」，而应引导到真正的界面。
+const FILE_PREVIEW = !/^https?:$/.test(location.protocol);
+
+function toast(msg){
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+function api(path, body){
+  return fetch(API_BASE + path, body === undefined ? {} : {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
+  }).then(r => { if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+}
+let connected = false;
+function setConnected(ok){
+  connected = ok === true;
+  $('connBanner').classList.toggle('show', !connected);
+  if(connected) return;
+  const lead = FILE_PREVIEW
+    ? '<b>这是本地静态文件预览，浏览器禁止它访问本机接口。</b><br>'
+    : '<b>按键引擎没有运行，当前看到的是静态预览。</b><br>';
+  $('connText').innerHTML = lead +
+    '请在程序目录双击 <code>start.vbs</code>（或 <code>start.bat</code>）启动引擎，等 1～2 秒后' +
+    '<a href="' + LIVE_URL + '" target="_blank">打开 ' + LIVE_URL + '</a> 才是真正能用的界面。';
+  $('retryBtn').textContent = FILE_PREVIEW ? '打开可用界面' : '重试连接';
+  if(FILE_PREVIEW){
+    const hp = $('hookPill'); hp.className = 'pill';
+    hp.innerHTML = '<span class="dot"></span>静态预览 · 未连接';
+  }
+}
+function poll(){
+  return api('/api/state')
+    .then(s => {
+      if(!s || !s.ok) throw new Error('bad state');
+      setConnected(true);                       // 连接成功只取决于接口是否通
+      try { applyState(s); }                    // 渲染异常不能反过来误报「引擎没启动」
+      catch(e){ console.error('applyState failed:', e); }
+      return true;
+    })
+    .catch(() => { setConnected(false); return false; });
+}
+function pushConfig(){
+  return api('/api/config', {config}).then(s => { applyState(s); });
+}
+function findKey(slot){ const id = (slot||'').split(':')[0];
+  for(const row of LAYOUT) for(const k of row) if(k.id === id) return k; return null; }
+function slotLabel(slot){
+  const k = findKey(slot); if(!k) return slot;
+  const layer = (config.labels||{})[k.id] || {};
+  const main = layer.main !== undefined ? layer.main : k.main;
+  const fn   = layer.fn   !== undefined ? layer.fn   : k.fn;
+  return slot.endsWith(':fn') ? (main + ' · Fn ' + (fn || '')) : (main + ' · 主键');
+}
+function triggerText(t){
+  if(!t) return '';
+  const base = (t.mods || []).map(m => MODCN[m] || m)
+    .concat([t.name || ('VK ' + t.vk)]).join(' + ');
+  return base + (t.any_mods ? '（忽略额外修饰键）' : '');
+}
+function actionText(a){
+  if(!a) return '';
+  if(a.display) return a.display;
+  if(a.type === 'none') return '禁用该键';
+  if(a.type === 'text') return '输入文本：' + a.text;
+  if(a.type === 'program') return '启动：' + a.path;
+  return (a.keys||[]).map(v => Object.keys(vkNames).find(n => vkNames[n] === v) || ('VK '+v)).join(' + ');
+}
+function srcLabel(slot){
+  const k = findKey(slot); if(!k) return '';
+  const layer = (config.labels||{})[k.id] || {};
+  return slot.endsWith(':fn') ? (layer.fn !== undefined ? layer.fn : k.fn) : (layer.main !== undefined ? layer.main : k.main);
+}
+
+function renderKeyboard(){
+  const host = $('keyboard'); host.innerHTML = '';
+  for(const row of LAYOUT){
+    const rowEl = document.createElement('div'); rowEl.className = 'krow';
+    for(const k of row){
+      const layer = (config.labels||{})[k.id] || {};
+      const main = layer.main !== undefined ? layer.main : k.main;
+      const fn   = layer.fn   !== undefined ? layer.fn   : k.fn;
+      const mainSlot = k.id + ':main', fnSlot = k.id + ':fn';
+      const el = document.createElement('div');
+      el.className = 'key'; el.style.flex = k.w || 1;
+      el.dataset.key = k.id;
+      const mappedMain = config.rules.some(r => r.slot === mainSlot);
+      const mappedFn   = fn !== null && config.rules.some(r => r.slot === fnSlot);
+      if(mappedMain || mappedFn) el.classList.add('mapped');
+      if(selected === mainSlot || selected === fnSlot) el.classList.add('sel');
+      const outMain = config.rules.find(r => r.slot === mainSlot);
+      const outFn   = config.rules.find(r => r.slot === fnSlot);
+      let out = '';
+      if(outMain && outFn) out = '主键→' + actionText(outMain.action) + ' ｜ Fn→' + actionText(outFn.action);
+      else if(outMain) out = '→ ' + actionText(outMain.action);
+      else if(outFn) out = 'Fn → ' + actionText(outFn.action);
+
+      const cls = k.tiny ? 'tiny' : (k.small ? 'small' : '');
+      const blue = k.blue ? ' blue' : '';
+      el.innerHTML =
+        (mappedMain || mappedFn ? '<span class="dot-mapped"></span>' : '') +
+        '<button class="key-body" data-slot="' + mainSlot + '" title="' + esc(slotLabel(mainSlot)) + '">' +
+          '<span class="main-label ' + cls + blue + '">' + esc(k.space ? '␣' : main) + '</span></button>' +
+        (out ? '<span class="out-label" title="' + esc(out) + '">' + esc(out) + '</span>' : '') +
+        (fn !== null ? (k.below
+          ? '<button class="fn-below" data-slot="' + fnSlot + '" title="' + esc(slotLabel(fnSlot)) + '">' + esc(fn) + '</button>'
+          : '<button class="fn-chip" data-slot="' + fnSlot + '" title="' + esc(slotLabel(fnSlot)) + '">' + esc(fn) + '</button>') : '');
+      rowEl.appendChild(el);
+    }
+    host.appendChild(rowEl);
+  }
+  host.querySelectorAll('[data-slot]').forEach(b => {
+    b.addEventListener('click', e => { e.stopPropagation(); selectSlot(b.dataset.slot); });
+  });
+}
+
+function selectSlot(slot){
+  selected = slot;
+  const rule = config.rules.find(r => r.slot === slot);
+  draft = {trigger: rule ? JSON.parse(JSON.stringify(rule.trigger)) : null,
+           triggerInput: rule ? ((rule.trigger && rule.trigger.input) || triggerText(rule.trigger)) : '',
+           action : rule ? JSON.parse(JSON.stringify(rule.action))  : null,
+           type   : rule ? (rule.action.type || 'keys') : 'keys'};
+  trigDirty = false;
+  renderKeyboard(); renderEditor();
+}
+
+function renderEditor(){
+  const host = $('editor');
+  if(!selected){ host.innerHTML = '<div class="empty">先在左边点一个键位（白色主键或蓝色 Fn 副键）。</div>';
+                $('editorHint').textContent = '先在左边点一个键位。'; return; }
+  const k = findKey(selected);
+  const layer = (config.labels||{})[k.id] || {};
+  $('editorHint').textContent = '当前选中：' + slotLabel(selected);
+  const g = catalog[activeGroup] || {name:'', items:[]};
+  const groups =
+    '<div class="group"><div class="chips" style="margin-bottom:5px">' +
+      catalog.map((x,i) => '<button class="chip' + (i === activeGroup ? ' active' : '') +
+        '" data-gtab="' + i + '">' + esc(x.name) + '</button>').join('') +
+    '</div><div class="chips">' +
+      g.items.map((it,i) => '<button class="chip' + (draft.action && draft.action.display === it.label ? ' active' : '') +
+        '" data-g="' + esc(g.name) + '" data-i="' + i + '">' + esc(it.label) + '</button>').join('') +
+    '</div></div>';
+  const custom = (draft.action && draft.action.type === 'keys' && !draft.action.display) ? actionText(draft.action) : '';
+  const textVal = draft.action && draft.action.type === 'text' ? (draft.action.text || '') : '';
+  const pathVal = draft.action && draft.action.type === 'program' ? (draft.action.path || '') : '';
+
+  const trigInput = draft.triggerInput !== undefined ? draft.triggerInput
+                    : (draft.trigger ? (draft.trigger.input || triggerText(draft.trigger)) : '');
+  const trigMatch = (draft.trigger && draft.trigger.any_mods) ? 'any' : 'exact';
+  const trigStatusTxt = draft.trigger
+    ? (draft.triggerDetail || (draft.trigger.source === 'manual'
+        ? '已解析，可直接保存；改写上面的文字会重新解析'
+        : '由空中飞鼠录制得到，也可以直接改写上面的文字重新指定'))
+    : '还没设置：直接在上面输入组合键，或点下面按钮用空中飞鼠录制';
+  host.innerHTML =
+    '<div class="field"><label>① 实际按法（触发条件）<span style="color:var(--blue);font-weight:600"> · 可手写</span></label>' +
+      '<input type="text" id="trigInput" spellcheck="false" autocomplete="off" ' +
+        'placeholder="例如 Ctrl+Win+Left、AltGr、Q、0x51、usage 0x0014" value="' + esc(trigInput) + '">' +
+      '<div class="val ' + (draft.trigger ? 'set':'') + '" id="trigVal" style="margin-top:7px">' +
+        (draft.trigger ? esc(triggerText(draft.trigger)) : '还没设置触发条件') + '</div>' +
+      '<div class="trig-status ' + (draft.trigger ? 'ok' : 'idle') + '" id="trigStatus">' +
+        esc(trigStatusTxt) + '</div>' +
+      '<div class="row" style="margin-top:8px">' +
+        '<button class="btn primary sm" id="recTrig">录制实际按法</button>' +
+        '<button class="btn sm" id="applyTrig">应用手写输入</button>' +
+        (draft.trigger ? '<button class="btn sm ghost" id="clearTrig">清除</button>' : '') + '</div>' +
+      '<div class="row" style="margin-top:8px">' +
+        '<span style="font-size:12px;color:var(--muted)">匹配方式</span>' +
+        '<select id="trigMatch">' +
+          '<option value="exact"' + (trigMatch === 'exact' ? ' selected' : '') + '>精确 · 只有列出的修饰键同时按住才触发</option>' +
+          '<option value="any"' + (trigMatch === 'any' ? ' selected' : '') + '>宽松 · 忽略额外同时按住的修饰键</option>' +
+        '</select></div>' +
+      '<p class="trig-help">修饰键写前面、最后一个是主键：<code>Ctrl+Alt+Q</code>；单键写 <code>Q</code>、<code>AltGr</code>、<code>Win</code>。' +
+        '也支持 <code>0x51</code>、<code>VK 229</code>、事件流里的 HID <code>usage 0x0014</code>；' +
+        '<code>Command / Super / Meta</code> 等同 Win。<b>Fn 不发给 Windows</b>，请先录制 Fn+白键，再照事件流写实际组合。</p></div>' +
+    '<div class="field"><label>② 替换为（按下后实际发出的内容）</label>' +
+      '<div class="val ' + (draft.action ? 'set':'') + '" id="actVal">' +
+      (draft.action ? esc(actionText(draft.action)) : '还没设置') + '</div>' +
+      '<div class="tabs" style="margin-top:9px">' +
+        '<button class="tab' + (draft.type==='keys'?' active':'') + '" data-type="keys">按键</button>' +
+        '<button class="tab' + (draft.type==='text'?' active':'') + '" data-type="text">文本</button>' +
+        '<button class="tab' + (draft.type==='program'?' active':'') + '" data-type="program">程序</button>' +
+        '<button class="tab' + (draft.type==='none'?' active':'') + '" data-type="none">禁用</button>' +
+      '</div>' +
+      '<div id="actionPane"></div>' +
+      '<div class="row" style="margin-top:8px"><button class="btn sm" id="recOut">录一个目标键</button>' +
+      '<button class="btn sm" id="testOut">试一下输出</button></div>' +
+    '</div>' +
+    '<div class="field"><label>键帽文字（照片识别有偏差时直接改）</label>' +
+      '<div class="row"><input type="text" id="labelMain" style="flex:1" value="' + esc(layer.main !== undefined ? layer.main : k.main) + '" placeholder="白色主键">' +
+      '<input type="text" id="labelFn" style="flex:1" value="' + esc(layer.fn !== undefined ? layer.fn : (k.fn || '')) + '" placeholder="蓝色 Fn 字符"></div>' +
+      '<button class="btn sm" id="saveLabel" style="margin-top:7px">保存键帽文字</button></div>' +
+    '<div class="row" style="margin-top:14px"><button class="btn primary" id="saveRule">保存这条规则</button>' +
+      (config.rules.some(r=>r.slot===selected) ? '<button class="btn danger sm" id="delRule">删除</button>' : '') +
+      '<button class="btn sm ghost" id="closeEditor">取消选择</button></div>';
+
+  renderActionPane(groups, custom, textVal, pathVal);
+  bindEditor();
+}
+
+function renderActionPane(groups, custom, textVal, pathVal){
+  const pane = $('actionPane');
+  if(draft.type === 'keys'){
+    pane.innerHTML = '<input type="text" id="customKeys" placeholder="自定义组合键，如 Ctrl+Win+Left（三键硬件受限时用这个）" value="' + esc(custom) + '">' +
+      '<p class="hint" style="margin:6px 0 0">想把某个键当成 Win / Ctrl 这类<b>修饰键按住使用</b>，请点下面「修饰键 / Win」分组里带「按住生效」的预设；在输入框里只写 Win 只会点按一下。<b>空中飞鼠按不出三键时</b>，直接在这里写完整组合（如 <code>Ctrl+Win+Left</code>），单键即可发出三键。</p>' + groups;
+  } else if(draft.type === 'text'){
+    pane.innerHTML = '<input type="text" id="customText" placeholder="要输入的文字" value="' + esc(textVal) + '"><p class="hint" style="margin-top:6px">按下后直接把这段文字打到当前光标处。</p>';
+  } else if(draft.type === 'program'){
+    pane.innerHTML = '<input type="text" id="customPath" placeholder="程序或文件路径，如 notepad.exe" value="' + esc(pathVal) + '">';
+  } else {
+    pane.innerHTML = '<p class="hint" style="margin-top:4px">按下后什么都不做（屏蔽这个键）。</p>';
+  }
+}
+
+// ① 实际按法：手写输入 -> 后端权威解析（组合键 / 别名 / 原始 VK / HID Usage）
+// 后端不可用时降级成本地解析，静态预览里也能继续填表。
+const LOCAL_ALIAS = {
+  control:'Ctrl', ctrlleft:'Lctrl', ctrlright:'Rctrl',
+  shiftleft:'Lshift', shiftright:'Rshift', altleft:'Lalt',
+  altgraph:'AltGr', altgr:'AltGr', ralt:'AltGr', rightalt:'AltGr',
+  windows:'Win', command:'Win', cmd:'Win', super:'Win', meta:'Win', gui:'Win',
+  del:'Delete', esc:'Esc', return:'Enter', spacebar:'Space',
+  pageup:'PgUp', pagedown:'PgDn', prtsc:'Printscreen',
+  arrowup:'Up', arrowdown:'Down', arrowleft:'Left', arrowright:'Right'
+};
+function parseTriggerLocal(text, any){
+  const keys = Object.keys(vkNames);
+  if(!keys.length) return {ok:false,
+    error:'手写解析需要本机引擎：请先双击 start.vbs，再打开 http://127.0.0.1:8765/'};
+  const lookup = {};
+  for(const n of keys) lookup[n.toLowerCase().replace(/[\s_]/g,'')] = vkNames[n];
+  for(const a in LOCAL_ALIAS){
+    const target = LOCAL_ALIAS[a].toLowerCase().replace(/[\s_]/g,'');
+    if(lookup[target] !== undefined) lookup[a] = lookup[target];
+  }
+  const toks = text.split(/[+,，、;；]/).map(s => s.trim()).filter(Boolean);
+  if(!toks.length) return {ok:false, error:'没读到按键'};
+  const modOf = vk => ({160:'shift',161:'shift',162:'ctrl',163:'ctrl',
+                        164:'alt',165:'alt',91:'win',92:'win'}[vk]);
+  const canon = vk => ({160:16,161:16,162:17,163:17,164:18,165:18,92:91}[vk] || vk);
+  const atoms = [];
+  for(const s of toks){
+    const n = s.toLowerCase().replace(/[\s_]/g,'');
+    if(n === 'fn') return {ok:false,
+      error:'Fn 是空中飞鼠内部层键，Windows 收不到；请先录制 Fn+白键，照事件流写实际组合'};
+    let vk = null, m = s.match(/^(?:vk|vkey|keycode)?\s*0x([0-9a-f]{1,4})$/i);
+    if(m) vk = parseInt(m[1],16);
+    else if((m = s.match(/^(?:vk|vkey|keycode)\s*[:#]?\s*(\d{1,3})$/i))) vk = parseInt(m[1],10);
+    else if(lookup[n] !== undefined) vk = lookup[n];
+    else if(/^\d{2,3}$/.test(s)) vk = parseInt(s,10);
+    if(vk === null) return {ok:false, error:'不认识的键名「' + s + '」；可用 Ctrl / Shift / Alt / Win / AltGr / Q / Left，或写 0x51'};
+    atoms.push({s, vk});
+  }
+  const mods = new Set();
+  for(let i = 0; i < atoms.length - 1; i++){
+    const md = modOf(atoms[i].vk);
+    if(!md) return {ok:false, error:'「' + atoms[i].s + '」不是修饰键；修饰键写前面，最后一个写主键，例如 Ctrl+Alt+Q'};
+    mods.add(md);
+  }
+  const last = atoms[atoms.length - 1];
+  const mainVk = last.vk === 165 ? 229 : canon(last.vk);
+  const modsList = ['ctrl','shift','alt','win'].filter(m => mods.has(m));
+  return {ok:true,
+    detail:'离线解析（未连引擎）· VK 0x' + mainVk.toString(16).toUpperCase().padStart(2,'0') +
+           ' · Mods ' + (modsList.join('+') || '无'),
+    trigger:{vk:mainVk, scan:0, mods:modsList,
+             name:(last.vk === 165 ? 'AltGr' : last.s),
+             any_mods:!!any, source:'manual', input:text}};
+}
+function parseTriggerNow(showToast){
+  const el = $('trigInput');
+  if(!el) return Promise.resolve(false);
+  clearTimeout(trigTimer);
+  const text = el.value;
+  draft.triggerInput = text;
+  const seq = ++trigSeq;
+  const any = $('trigMatch') ? $('trigMatch').value === 'any' : false;
+  const finish = res => {
+    if(seq !== trigSeq || $('trigInput') !== el || el.value !== text) return false;
+    const val = $('trigVal'), st = $('trigStatus');
+    if(res.ok && res.trigger){
+      draft.trigger = res.trigger;
+      draft.triggerDetail = res.detail || '';
+      trigDirty = false;
+      if(val){ val.textContent = triggerText(res.trigger); val.className = 'val set'; }
+      if(st){ st.textContent = res.detail || '已解析，可保存'; st.className = 'trig-status ok'; }
+      if(showToast) toast('已应用：' + triggerText(res.trigger));
+      return true;
+    }
+    draft.trigger = null; draft.triggerDetail = '';
+    if(val){ val.textContent = '还没设置触发条件'; val.className = 'val'; }
+    if(st){
+      st.textContent = res.error || '无法识别这段按键组合';
+      st.className = 'trig-status ' + (text.trim() ? 'err' : 'idle');
+    }
+    if(showToast) toast(res.error || '无法识别');
+    return false;
+  };
+  if(!text.trim()){
+    return Promise.resolve(finish({ok:false, error:'还没设置：直接输入组合键，或点「录制实际按法」'}));
+  }
+  return api('/api/trigger/parse', {text, any_mods:any})
+    .then(finish)
+    .catch(() => finish(parseTriggerLocal(text, any)));
+}
+
+function bindEditor(){
+  const on = (id, fn) => { const e = $(id); if(e) e.addEventListener('click', fn); };
+  on('recTrig', () => api('/api/record/start', {mode:'trigger', slot:selected}).then(applyState));
+  on('recOut',  () => api('/api/record/start', {mode:'output',  slot:selected}).then(applyState));
+  on('applyTrig', () => parseTriggerNow(true));
+  on('clearTrig',() => { draft.trigger = null; draft.triggerInput = '';
+                         draft.triggerDetail = ''; trigDirty = false; renderEditor(); });
+  on('testOut', () => { if(!draft.action){ toast('先设置替换内容'); return; }
+                        api('/api/test', {action:draft.action}).then(()=>toast('已发送一次输出')); });
+  on('saveRule', saveRule);
+  on('delRule', () => { config.rules = config.rules.filter(r => r.slot !== selected);
+                        pushConfig().then(()=>{ renderKeyboard(); renderRules(); renderEditor(); toast('规则已删除'); }); });
+  on('closeEditor', () => { selected = null; renderKeyboard(); renderEditor(); });
+  on('saveLabel', () => {
+    const k = findKey(selected);
+    config.labels = config.labels || {};
+    config.labels[k.id] = {main:$('labelMain').value, fn:$('labelFn').value};
+    pushConfig().then(()=>{ renderKeyboard(); renderEditor(); renderRules(); toast('键帽文字已保存'); });
+  });
+  $('editor').querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+    draft.type = t.dataset.type;
+    if(draft.type === 'none') draft.action = {type:'none', display:'禁用该键'};
+    else if(draft.type === 'text') draft.action = {type:'text', text:textOf('customText') || (draft.action && draft.action.text) || ''};
+    else if(draft.type === 'program') draft.action = {type:'program', path:(draft.action && draft.action.path) || ''};
+    else draft.action = null;
+    renderEditor();
+  }));
+  $('editor').querySelectorAll('.chip[data-gtab]').forEach(c => c.addEventListener('click', () => {
+    activeGroup = +c.dataset.gtab; renderEditor();
+  }));
+  $('editor').querySelectorAll('.chip[data-g]').forEach(c => c.addEventListener('click', () => {
+    const grp = catalog.find(x => x.name === c.dataset.g);
+    draft.action = JSON.parse(JSON.stringify(grp.items[+c.dataset.i].action));
+    draft.type = 'keys'; renderEditor();
+  }));
+  const bind = (id, fn) => { const e = $(id); if(e) e.addEventListener('input', fn); };
+  bind('customKeys', e => {
+    const keys = parseKeys(e.target.value);
+    draft.action = keys.length ? {type:'keys', keys} : null;
+    const v = $('actVal'); v.textContent = keys.length ? actionText(draft.action) : '组合键无法识别';
+    v.className = 'val ' + (keys.length ? 'set' : '');
+  });
+  bind('customText', e => { draft.action = {type:'text', text:e.target.value};
+                            $('actVal').textContent = actionText(draft.action); $('actVal').className = 'val set'; });
+  bind('customPath', e => { draft.action = {type:'program', path:e.target.value};
+                            $('actVal').textContent = actionText(draft.action); $('actVal').className = 'val set'; });
+  const ti = $('trigInput');
+  if(ti){
+    ti.addEventListener('input', e => {
+      draft.triggerInput = e.target.value; trigDirty = true;
+      clearTimeout(trigTimer);
+      trigTimer = setTimeout(() => parseTriggerNow(false), 220);
+    });
+    ti.addEventListener('blur', () => parseTriggerNow(false));
+    ti.addEventListener('keydown', e => {
+      if(e.key === 'Enter'){ e.preventDefault(); clearTimeout(trigTimer); parseTriggerNow(true); }
+    });
+  }
+  const tm = $('trigMatch');
+  if(tm) tm.addEventListener('change', () => { trigDirty = true; parseTriggerNow(false); });
+}
+function textOf(id){ const e = $(id); return e ? e.value : ''; }
+function parseKeys(str){
+  const out = [];
+  for(const raw of String(str).split('+')){
+    const s = raw.trim(); if(!s) continue;
+    const key = Object.keys(vkNames).find(n => n.toLowerCase() === s.toLowerCase());
+    if(key === undefined) return [];
+    out.push(vkNames[key]);
+  }
+  return out;
+}
+function saveRule(){
+  if(!selected){ toast('先选一个键位'); return; }
+  const proceed = () => {
+    if(!draft.trigger){ toast('还没设置实际按法：直接手写，或用空中飞鼠录制'); return; }
+    if(!draft.action){ toast('还没设置替换内容'); return; }
+    if(draft.action.type === 'text' && !draft.action.text){ toast('请输入文本'); return; }
+    if(draft.action.type === 'program' && !draft.action.path){ toast('请输入程序路径'); return; }
+    const trig = JSON.parse(JSON.stringify(draft.trigger));
+    trig.input = draft.triggerInput || trig.input || triggerText(trig);
+    const rule = {id:selected, slot:selected, label:slotLabel(selected), src:srcLabel(selected),
+                  trigger:trig,
+                  action:JSON.parse(JSON.stringify(draft.action)), active:true,
+                  triggerText:triggerText(trig), actionText:actionText(draft.action)};
+    const dup = config.rules.findIndex(r => r.slot !== selected &&
+        r.trigger.vk === rule.trigger.vk && JSON.stringify(r.trigger.mods) === JSON.stringify(rule.trigger.mods));
+    if(dup >= 0){ toast('这个实际按法已经被「' + config.rules[dup].label + '」占用了'); return; }
+    const i = config.rules.findIndex(r => r.slot === selected);
+    if(i >= 0) config.rules[i] = rule; else config.rules.push(rule);
+    pushConfig().then(()=>{ renderKeyboard(); renderRules(); renderEditor(); toast('规则已保存'); });
+  };
+  // 输入框有未解析的改动时，先解析完再保存，避免「框里写的」和「保存的」不一致
+  if(trigDirty) parseTriggerNow(false).then(proceed);
+  else proceed();
+}
+
+function renderRules(){
+  const host = $('rules');
+  $('ruleCount').textContent = '(' + config.rules.length + ')';
+  if(!config.rules.length){ host.innerHTML = '<div class="empty">还没有规则。点左边键帽开始配置。</div>'; return; }
+  host.innerHTML = config.rules.map((r,i) =>
+    '<div class="rule"><div class="top"><span class="name">' + esc(r.label || slotLabel(r.slot)) + '</span>' +
+    '<button class="btn sm ghost" data-act="toggle" data-i="' + i + '">' + (r.active === false ? '已停用' : '启用中') + '</button>' +
+    '<button class="btn sm ghost danger" data-act="del" data-i="' + i + '">删除</button></div>' +
+    '<div class="map">' + esc(r.triggerText || triggerText(r.trigger)) + '　→　<b>' + esc(r.actionText || actionText(r.action)) + '</b></div></div>').join('');
+  host.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', () => {
+    const i = +b.dataset.i;
+    if(b.dataset.act === 'del'){ config.rules.splice(i,1); }
+    else { config.rules[i].active = config.rules[i].active === false; }
+    pushConfig().then(()=>{ renderKeyboard(); renderRules(); if(selected) renderEditor(); });
+  }));
+}
+
+let lastEvents = [];
+const EVENT_KIND_CN = {down:'按下', up:'抬起', hit:'命中', capture:'录制', toggle:'开关', inject:'注入', altgr:'AltGr'};
+function rawLine(r){
+  if(!r) return '';
+  const bits = [];
+  if(r.ext) bits.push('EXT');
+  if(r.lowerIL) bits.push('LOWER_IL');
+  if(r.injected) bits.push('INJECTED');
+  if(r.altdown) bits.push('ALTDOWN');
+  if(r.released) bits.push('UP');
+  const l1 = 'VK ' + r.vk + '  Scan ' + r.scan + '  Flags ' + r.flags +
+    (bits.length ? ' [' + bits.join(' ') + ']' : '') +
+    '  ' + r.msgName + '(' + r.msg + ')  Time ' + r.time + '  Extra ' + r.extra;
+  const h = r.hid || {};
+  const l2 = '※ HID Page ' + h.page + '  Usage ' + h.usage + '  ' + (h.name || '') +
+    (h.report ? '  Mod ' + h.mod + '  Report ' + h.report : '');
+  return {l1, l2, dim: h.usage === '—'};
+}
+function renderEvents(events){
+  const host = $('events');
+  lastEvents = events || [];
+  const showRaw = $('showRaw') ? $('showRaw').checked : true;
+  const showUp = $('showUp') ? $('showUp').checked : false;
+  const list = lastEvents.filter(e => showUp || e.kind !== 'up');
+  host.innerHTML = list.slice().reverse().map(e => {
+    const r = showRaw ? rawLine(e.raw) : null;
+    const rawHtml = r && r.l1
+      ? '<div class="ev-raw">' + esc(r.l1) + '</div>' +
+        '<div class="ev-hid' + (r.dim ? ' dim' : '') + '" title="点击复制这一行">' + esc(r.l2) + '</div>'
+      : (showRaw && !e.raw ? '<div class="ev-raw dim">（非键盘事件，无原始字段）</div>' : '');
+    return '<div class="ev ' + esc(e.kind) + '"' +
+      (e.slot ? ' data-slot="' + esc(e.slot) + '" style="cursor:pointer" title="点击配置这个键位"' : '') + '>' +
+      '<div class="ev-head"><span class="time">' + esc(e.t) + '</span>' +
+      '<span class="kind">' + (EVENT_KIND_CN[e.kind] || esc(e.kind)) + '</span>' +
+      '<span class="detail">' + esc((e.name || '') + (e.detail ? '  ' + e.detail : '')) + '</span></div>' +
+      rawHtml + '</div>';
+  }).join('') || '<div class="empty">还没有按键事件。</div>';
+  host.querySelectorAll('[data-slot]').forEach(el =>
+    el.addEventListener('click', () => selectSlot(el.dataset.slot)));
+  host.querySelectorAll('.ev-hid').forEach(el => el.addEventListener('click', ev => {
+    ev.stopPropagation();
+    if(navigator.clipboard) navigator.clipboard.writeText(el.textContent)
+      .then(() => toast('已复制 HID 信息')).catch(() => {});
+  }));
+}
+$('showRaw').addEventListener('change', () => renderEvents(lastEvents));
+$('showUp').addEventListener('change', () => renderEvents(lastEvents));
+
+function renderDiag(s){
+  const d = (s && s.diag) || {peak:0, history:[]};
+  const peak = d.peak || 0;
+  $('diagPeak').textContent = peak;
+  const hist = d.history || [];
+  $('diagHistory').innerHTML = hist.length
+    ? hist.slice().reverse().map(x => '<div>' + esc(x.t) + ' · ' + esc(String(x.n)) + ' 键 · ' + esc(x.chord) + '</div>').join('')
+    : '<div>还没有记录。按住三个键试一下。</div>';
+  $('diagHint').innerHTML = peak >= 3
+    ? '<b>三键都到达了引擎</b>，硬件没问题。若组合仍无效果，多半是 Windows 把该组合占用为系统快捷键（例如 <code>Ctrl+Win+←</code> 是切换虚拟桌面），或者某个修饰键被提前松开 —— 看事件流里的绿色命中与紫色注入键。'
+    : '<b>如果刚才确实按了三个键，但峰值只有 ' + peak + '</b>，说明空中飞鼠 / 键盘硬件没把第三个键发出来（多键回滚 2KRO），应用层无法补救。<b>替代方案：</b>把整个组合绑到一个键上 —— 点某个键位 → 录制它 → 在「替换为」的自定义组合键里输入 <code>Ctrl+Win+Left</code> 这类完整组合 → 保存，之后单键即可发出三键组合。';
+}
+$('diagReset').addEventListener('click', () =>
+  api('/api/diag/reset', {}).then(applyState).then(() => toast('诊断记录已重置')));
+
+const CHORD_ORDER = {ctrl:0, shift:1, alt:2, win:3};
+function chordParts(s){
+  const c = (s && s.chord) || {pressed:[], holds:[]};
+  const real = c.pressed || [];
+  const inj = [];
+  (c.holds || []).forEach(h => (h.keys || []).forEach(k =>
+    inj.push(Object.assign({}, k, {from:h.trigger}))));
+  // 被规则替换掉的原键系统收不到，只出现在「来源拆解」，不算进等效组合
+  const heldTriggers = new Set((c.holds || []).map(h => h.triggerVk).filter(v => v !== undefined));
+  const ord = k => (CHORD_ORDER[k.mod] === undefined ? 9 : CHORD_ORDER[k.mod]);
+  const parts = [];
+  real.filter(k => k.mod).slice().sort((a,b) => ord(a)-ord(b))
+    .forEach(k => parts.push({label:k.name, cls:'kc mod', tip:'真实按下的修饰键'}));
+  inj.filter(k => k.mod).slice().sort((a,b) => ord(a)-ord(b))
+    .forEach(k => parts.push({label:k.name, cls:'kc inj', tip:'由 ' + k.from + ' 映射注入并保持'}));
+  inj.filter(k => !k.mod)
+    .forEach(k => parts.push({label:k.name, cls:'kc inj', tip:'由 ' + k.from + ' 映射注入并保持'}));
+  real.filter(k => !k.mod && !heldTriggers.has(k.vk))
+    .forEach(k => parts.push({label:k.name, cls:'kc', tip:'真实按下的键'}));
+  return {parts, real, inj, heldTriggers};
+}
+function chordHtml(parts){
+  if(!parts.length) return '<span class="kc placeholder">（没有按住的键）</span>';
+  return parts.map((p,i) => (i ? '<span class="plus">+</span>' : '') +
+    '<span class="' + p.cls + '" title="' + esc(p.tip) + '">' + esc(p.label) + '</span>').join('');
+}
+function renderChord(s){
+  const {parts, real, inj, heldTriggers} = chordParts(s);
+  const keys = $('chordKeys'); if(keys) keys.innerHTML = chordHtml(parts);
+  const float = $('chordFloat'); if(float) float.classList.toggle('idle', parts.length === 0);
+  const det = $('chordDetail');
+  if(!det) return;
+  det.innerHTML =
+    '<div class="chord-detail"><span class="lbl">系统里等效的组合</span>' + chordHtml(parts) + '</div>' +
+    '<div class="chord-detail"><span class="lbl">来源拆解</span>' +
+      (real.length ? real.map(k => {
+          const rep = heldTriggers.has(k.vk);
+          return '<span class="kc' + (rep ? ' replaced' : '') + '" title="' +
+            (rep ? '真实按下，但已被规则替换，系统收不到' : '真实按下') + '">' + esc(k.name) + '</span>';
+        }).join('')
+                   : '<span class="kc placeholder">无真实按键</span>') +
+      (inj.length ? inj.map(k => '<span class="kc inj" title="由 ' + esc(k.from) + ' 注入">' +
+                     esc(k.name) + '</span>').join('')
+                  : '<span class="kc placeholder">无注入键</span>') +
+    '</div>' +
+    '<p class="hint" style="margin:8px 0 0">组合预览：<b>' +
+      esc(parts.length ? parts.map(p => p.label).join(' + ') : '（无）') + '</b></p>';
+}
+
+function applyState(s){
+  if(!s || !s.ok) return;
+  config = s.config; config.labels = config.labels || {};
+  catalog = s.catalog || []; vkNames = s.vkNames || {};
+  // 首屏用 ?slot= 直达时，选中键位发生在配置加载之前，draft 会是空的；
+  // 第一次拿到配置后按已有规则重新初始化一次（之后不再覆盖用户编辑）。
+  if(!initialSyncDone){
+    initialSyncDone = true;
+    if(selected && !draft.trigger && !draft.action) selectSlot(selected);
+  }
+  if(!catalogReady && catalog.length){
+    catalogReady = true;
+    if(selected) renderEditor();   // 目录数据到达后补齐预设按钮
+  }
+  const sig = JSON.stringify(config.rules) + '|' + config.enabled + '|' + selected;
+  if(sig !== lastRuleSig){ lastRuleSig = sig; renderKeyboard(); renderRules(); }
+
+  // 键盘捕获总闸：capture_on 是实际钩子状态，关闭时钩子已卸载（不是「安装失败」）
+  captureOn = (s.capture_on === undefined) ? !!s.hook_ok : !!s.capture_on;
+  const cb = $('captureBtn');
+  if(cb){
+    cb.textContent = '键盘捕获：' + (captureOn ? '开启' : '关闭');
+    cb.title = captureOn ? '点击关闭：卸载低级键盘钩子，所有按键原样放行'
+                         : '点击开启：重新安装低级键盘钩子';
+    cb.className = 'btn capture ' + (captureOn ? 'on' : 'off');
+  }
+  const notice = $('capNotice');
+  if(notice) notice.classList.toggle('show', !captureOn);
+
+  const mb = $('masterBtn');
+  mb.textContent = '总开关：' + (config.enabled ? '开启' : '关闭');
+  mb.className = 'btn master' + (config.enabled ? '' : ' off');
+  const hp = $('hookPill');
+  if(!captureOn){
+    hp.className = 'pill';
+    hp.innerHTML = '<span class="dot"></span>捕获已关闭 · 按键原样放行';
+  } else {
+    hp.className = 'pill ' + (s.hook_ok ? (config.enabled ? 'on' : '') : 'bad');
+    hp.innerHTML = '<span class="dot"></span>' + (s.hook_ok ? (config.enabled ? '映射运行中' : '引擎就绪 · 映射已停') : '钩子安装失败');
+  }
+
+  const stuck = $('stuckInfo');
+  if(stuck){
+    const names = (s.stuck_mods || []).map(x => x.name);
+    stuck.classList.toggle('show', names.length > 0);
+    stuck.innerHTML = names.length
+      ? '<b>检测到系统里卡住的键：' + esc(names.slice(0, 4).join('、')) + '</b> —— 它会让所有按键都变成组合键。'
+        + '点右上角「释放卡住的键」，或直接关闭键盘捕获。'
+      : '';
+  }
+
+  const banner = $('recBanner');
+  if(banner && s.recording){
+    banner.classList.add('show');
+    $('recText').textContent = (s.recording.mode === 'output' ? '请按下你想「替换成」的目标键…' : '请在空中飞鼠上按下按键或 Fn 组合…')
+      + '（' + Math.ceil(s.recording.remaining || 0) + ' 秒）';
+  } else if(banner) banner.classList.remove('show');
+
+  if(s.capture && s.capture.seq !== lastSeq){
+    lastSeq = s.capture.seq;
+    const t = s.capture.trigger;
+    if(s.capture.mode === 'trigger'){
+      draft.trigger = t;
+      draft.triggerInput = triggerText(t);
+      draft.triggerDetail = '由空中飞鼠录制得到 · VK 0x' +
+        Number(t.vk || 0).toString(16).toUpperCase().padStart(2,'0') +
+        ' · Scan 0x' + Number(t.scan || 0).toString(16).toUpperCase().padStart(2,'0');
+      trigDirty = false;
+      toast('已录到：' + triggerText(t));
+    } else {
+      const keys = (t.mods || []).map(m => MODVK[m]).concat([t.vk]);
+      draft.action = {type:'keys', keys, display:triggerText(t)};
+      draft.type = 'keys'; toast('目标键已录到：' + triggerText(t));
+    }
+    if(selected) renderEditor();
+  }
+  renderEvents(s.events || []);
+  renderChord(s);
+  renderDiag(s);
+}
+
+$('captureBtn').addEventListener('click', () => {
+  const want = !captureOn;
+  api('/api/capture', {on:want}).then(s => {
+    applyState(s);
+    if(s.capture_result === false){ toast('钩子安装失败，请用 debug.bat 查看日志'); return; }
+    toast(want ? '键盘捕获已开启' : '键盘捕获已关闭 · 所有按键原样放行');
+  }).catch(() => toast('无法连接本机引擎'));
+});
+$('releaseBtn').addEventListener('click', () => {
+  api('/api/release', {}).then(s => {
+    applyState(s);
+    const r = s.released || [];
+    toast(r.length ? ('已解除卡住的键：' + r.slice(0, 3).join('、')) : '检查完成：没有卡住的修饰键');
+  }).catch(() => toast('无法连接本机引擎'));
+});
+$('masterBtn').addEventListener('click', () => api('/api/enable', {enabled:!config.enabled}).then(applyState));
+$('exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(config, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'air-mouse-mappings.json'; a.click(); URL.revokeObjectURL(a.href);
+});
+$('importBtn').addEventListener('click', () => $('fileInput').click());
+$('fileInput').addEventListener('change', e => {
+  const f = e.target.files[0]; if(!f) return;
+  const rd = new FileReader();
+  rd.onload = () => { try{ const c = JSON.parse(rd.result);
+      if(!Array.isArray(c.rules)) throw new Error('格式不对');
+      api('/api/import', {config:c}).then(s => { lastRuleSig=''; applyState(s); toast('配置已导入'); });
+    } catch(err){ toast('导入失败：' + err.message); } };
+  rd.readAsText(f); e.target.value = '';
+});
+$('clearBtn').addEventListener('click', () => {
+  if(!config.rules.length) return;
+  if(!confirm('确定清空全部 ' + config.rules.length + ' 条映射规则？')) return;
+  config.rules = []; pushConfig().then(()=>{ lastRuleSig=''; renderKeyboard(); renderRules();
+    if(selected) renderEditor(); toast('已清空'); });
+});
+
+renderKeyboard(); renderRules(); renderEditor(); renderEvents([]); renderChord(null); renderDiag(null);
+const initialSlot = new URLSearchParams(location.search).get('slot');
+if(initialSlot && findKey(initialSlot)) selectSlot(initialSlot);
+$('recCancel').addEventListener('click', () => api('/api/record/stop', {}).then(applyState));
+$('retryBtn').addEventListener('click', () => {
+  if(FILE_PREVIEW){ window.open(LIVE_URL, '_blank'); toast('已打开新标签；若显示无法访问，请先启动引擎'); return; }
+  poll().then(ok => toast(ok ? '已连上按键引擎' : '还没连上，请先双击 start.vbs 启动引擎'));
+});
+if(FILE_PREVIEW){
+  setConnected(false);            // 静态预览不做无谓轮询，避免刷屏 CORS 报错
+} else {
+  poll();
+  setInterval(poll, 400);
+}
+</script>
+</body>
+</html>

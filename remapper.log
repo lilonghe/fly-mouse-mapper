@@ -1,0 +1,226 @@
+20:51:18  engine initialised
+20:51:54  engine initialised
+20:51:54  keyboard hook installed
+20:51:54  serving http://127.0.0.1:8765/  (hook=True)
+20:52:30  enabled = True
+20:53:18  enabled = False
+20:53:19  enabled = True
+21:15:00  recording started (trigger)
+21:15:07  captured W (trigger)
+21:15:15  recording started (trigger)
+21:15:16  captured W (trigger)
+21:15:19  recording started (trigger)
+21:15:31  recording started (trigger)
+21:15:37  captured Shift + Rbracket (trigger)
+21:15:44  recording started (trigger)
+21:15:50  captured W (trigger)
+21:15:56  recording started (trigger)
+21:16:03  recording started (trigger)
+21:16:04  captured W (trigger)
+21:16:07  recording started (trigger)
+21:16:08  captured W (trigger)
+21:23:22  engine initialised
+21:23:30  engine initialised
+21:23:30  captured Ctrl + Q (trigger)
+21:23:59  engine initialised
+21:23:59  config loaded: 0 rules
+21:23:59  keyboard hook installed
+21:23:59  serving http://127.0.0.1:8765/  (hook=True)
+21:25:31  engine initialised
+21:25:31  config loaded: 0 rules
+21:25:31  keyboard hook installed
+21:25:31  serving http://127.0.0.1:8765/  (hook=True)
+21:27:17  engine initialised
+21:29:07  engine initialised
+21:29:07  captured Ctrl + Q (trigger)
+21:29:08  engine initialised
+21:29:40  engine initialised
+21:29:40  config loaded: 0 rules
+21:29:40  keyboard hook installed
+21:29:40  serving http://127.0.0.1:8765/  (hook=True)
+21:41:59  recording started (trigger)
+21:44:56  recording started (trigger)
+21:45:06  recording started (trigger)
+21:51:51  engine initialised
+21:51:51  captured Ctrl + Q (trigger)
+21:52:35  engine initialised
+21:52:35  captured Ctrl + Q (trigger)
+21:52:35  captured Ctrl (trigger)
+21:52:35  captured Win (trigger)
+21:52:35  captured AltGr (trigger)
+21:52:35  captured AltGr (trigger)
+21:53:36  engine initialised
+21:53:36  config loaded: 1 rules
+21:53:36  keyboard hook installed
+21:53:37  serving http://127.0.0.1:8765/  (hook=True)
+21:54:39  recording started (trigger)
+21:54:45  recording started (trigger)
+21:55:47  recording started (trigger)
+21:55:53  recording started (trigger)
+21:57:26  engine initialised
+21:57:26  captured Ctrl + Q (trigger)
+21:57:26  captured Ctrl (trigger)
+21:57:26  captured Win (trigger)
+21:57:26  captured AltGr (trigger)
+21:57:26  captured AltGr (trigger)
+21:57:26  captured AltGr (trigger)
+21:57:26  captured AltGr (trigger)
+21:57:49  engine initialised
+21:57:49  config loaded: 1 rules
+21:57:49  keyboard hook installed
+21:57:49  serving http://127.0.0.1:8765/  (hook=True)
+21:57:56  recording started (trigger)
+21:58:01  recording started (trigger)
+22:13:59  recording started (trigger)
+22:14:00  captured Printscreen (trigger)
+22:20:11  engine initialised
+22:20:11  captured Ctrl + Q (trigger)
+22:20:11  captured Ctrl (trigger)
+22:20:11  captured Win (trigger)
+22:20:11  captured AltGr (trigger)
+22:20:11  captured AltGr (trigger)
+22:20:11  captured AltGr (trigger)
+22:20:11  captured AltGr (trigger)
+22:22:29  engine initialised
+22:22:29  captured Ctrl + Q (trigger)
+22:22:29  captured Ctrl (trigger)
+22:22:29  captured Win (trigger)
+22:22:29  captured AltGr (trigger)
+22:22:29  captured AltGr (trigger)
+22:22:29  captured AltGr (trigger)
+22:22:29  captured AltGr (trigger)
+22:23:28  engine initialised
+22:23:28  captured Ctrl + Q (trigger)
+22:23:28  captured Ctrl (trigger)
+22:23:28  captured Win (trigger)
+22:23:28  captured AltGr (trigger)
+22:23:28  captured AltGr (trigger)
+22:23:28  captured AltGr (trigger)
+22:23:28  captured AltGr (trigger)
+22:24:28  engine initialised
+22:24:28  config loaded: 1 rules
+22:24:28  keyboard hook installed
+22:24:28  serving http://127.0.0.1:8765/  (hook=True)
+22:24:35  recording started (trigger)
+22:24:40  recording started (trigger)
+22:26:00  recording started (trigger)
+22:26:06  recording started (trigger)
+22:45:21  enabled = False
+22:45:24  enabled = True
+22:54:40  engine initialised
+22:54:40  captured Ctrl + Q (trigger)
+22:54:40  captured Ctrl (trigger)
+22:54:40  captured Win (trigger)
+22:54:40  captured AltGr (trigger)
+22:54:40  captured AltGr (trigger)
+22:54:40  captured AltGr (trigger)
+22:54:40  captured AltGr (trigger)
+22:55:04  engine initialised
+22:55:04  captured Ctrl + Q (trigger)
+22:55:04  captured Ctrl (trigger)
+22:55:04  captured Win (trigger)
+22:55:04  captured AltGr (trigger)
+22:55:04  captured AltGr (trigger)
+22:55:04  captured AltGr (trigger)
+22:55:04  captured AltGr (trigger)
+22:55:54  engine initialised
+22:55:54  config loaded: 1 rules
+22:55:54  keyboard hook installed
+22:55:55  serving http://127.0.0.1:8765/  (hook=True)
+22:56:46  chord diagnostics reset
+22:57:43  chord diagnostics reset
+22:57:46  chord diagnostics reset
+23:07:50  engine initialised
+23:10:19  engine initialised
+23:10:19  captured Ctrl + Q (trigger)
+23:10:19  captured Ctrl (trigger)
+23:10:19  captured Win (trigger)
+23:10:19  captured AltGr (trigger)
+23:10:19  captured AltGr (trigger)
+23:10:19  captured AltGr (trigger)
+23:10:19  captured AltGr (trigger)
+23:10:19  released stuck modifiers: RAlt (AltGr)
+23:10:19  capture OFF (ui) released=['RAlt (AltGr)']
+23:10:19  capture ON (ui) ok=True
+23:11:13  engine initialised
+23:11:13  config loaded: 1 rules, capture=False
+23:11:13  capture is OFF in saved config; keyboard hook NOT installed
+23:11:13  serving http://127.0.0.1:8765/  (hook=False)
+23:12:06  keyboard hook installed
+23:12:06  capture ON (ui) ok=True
+23:12:08  hook loop ended
+23:12:08  capture OFF (ui) released=[]
+23:12:09  capture ON (link) ok=True
+23:12:09  keyboard hook installed
+23:12:10  hook loop ended
+23:12:10  capture OFF (ui) released=[]
+23:32:20  config saved: 1 rules, enabled=True
+23:32:20  config saved: 1 rules, enabled=True
+23:32:43  keyboard hook installed
+23:32:43  capture ON (ui) ok=True
+23:33:18  hook loop ended
+23:33:18  capture OFF (ui) released=[]
+23:36:43  keyboard hook installed
+23:36:43  capture ON (ui) ok=True
+23:36:44  hook loop ended
+23:36:44  capture OFF (ui) released=[]
+23:36:47  enabled = False
+23:36:54  enabled = True
+23:37:05  enabled = False
+23:37:06  capture ON (ui) ok=True
+23:37:06  keyboard hook installed
+23:37:18  enabled = True
+23:43:54  chord diagnostics reset
+23:44:03  chord diagnostics reset
+23:46:52  engine initialised
+23:47:27  engine initialised
+23:47:27  captured Ctrl + Q (trigger)
+23:47:27  captured Ctrl (trigger)
+23:47:27  captured Win (trigger)
+23:47:27  captured AltGr (trigger)
+23:47:27  captured AltGr (trigger)
+23:47:27  captured AltGr (trigger)
+23:47:27  captured AltGr (trigger)
+23:47:27  released stuck modifiers: RAlt (AltGr)
+23:47:27  capture OFF (ui) released=['RAlt (AltGr)']
+23:47:27  capture ON (ui) ok=True
+23:48:13  engine initialised
+23:48:13  config loaded: 1 rules, capture=True
+23:48:13  keyboard hook installed
+23:48:13  serving http://127.0.0.1:8765/  (hook=True)
+23:51:06  config saved: 1 rules, enabled=True
+23:51:07  config saved: 1 rules, enabled=True
+23:52:33  engine initialised
+23:52:33  captured Ctrl + Q (trigger)
+23:52:33  captured Ctrl (trigger)
+23:52:33  captured Win (trigger)
+23:52:33  captured AltGr (trigger)
+23:52:33  captured AltGr (trigger)
+23:52:33  captured AltGr (trigger)
+23:52:33  captured AltGr (trigger)
+23:52:33  released stuck modifiers: RAlt (AltGr)
+23:52:33  capture OFF (ui) released=['RAlt (AltGr)']
+23:52:33  capture ON (ui) ok=True
+23:52:39  engine initialised
+23:52:39  config loaded: 1 rules, capture=True
+23:52:40  keyboard hook installed
+23:52:40  serving http://127.0.0.1:8765/  (hook=True)
+23:52:52  config saved: 1 rules, enabled=True
+23:52:52  config saved: 1 rules, enabled=True
+23:53:50  config saved: 1 rules, enabled=True
+23:53:51  config saved: 1 rules, enabled=True
+00:08:05  engine initialised
+00:08:05  captured Ctrl + Q (trigger)
+00:08:05  captured Ctrl (trigger)
+00:08:05  captured Win (trigger)
+00:08:05  captured AltGr (trigger)
+00:08:05  captured AltGr (trigger)
+00:08:05  captured AltGr (trigger)
+00:08:05  captured AltGr (trigger)
+00:08:05  released stuck modifiers: RAlt (AltGr)
+00:08:05  capture OFF (ui) released=['RAlt (AltGr)']
+00:08:05  capture ON (ui) ok=True
+00:08:26  engine initialised
+00:08:26  config loaded: 1 rules, capture=True
+00:08:27  keyboard hook installed
+00:08:27  serving http://127.0.0.1:8765/  (hook=True)

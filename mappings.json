@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "enabled": true,
+  "rules": [
+    {
+      "slot": "r4c7:main",
+      "trigger": {
+        "vk": 229,
+        "scan": 0,
+        "mods": [],
+        "name": "AltGr",
+        "any_mods": false
+      },
+      "action": {
+        "type": "keys",
+        "keys": [
+          91
+        ],
+        "hold": true,
+        "display": "Win 键（按住生效）"
+      },
+      "active": true,
+      "triggerText": "AltGr",
+      "actionText": "Win 键（按住生效）"
+    }
+  ],
+  "labels": {},
+  "capture": true
+}
